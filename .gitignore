@@ -9,3 +9,6 @@ build/
 .venv/
 venv/
 *.log
+test_resume.docx
+test_resume.pdf
+samples/
