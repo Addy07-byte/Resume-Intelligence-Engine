@@ -1,6 +1,5 @@
-import fitz  # PyMuPDF
+import fitz
 from docx import Document
-import os
 
 def parse_resume(file_path: str) -> str:
     if file_path.endswith(".pdf"):
