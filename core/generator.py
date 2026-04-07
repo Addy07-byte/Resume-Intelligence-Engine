@@ -5,57 +5,55 @@ load_dotenv()
 
 client = OpenAI()
 
-def build_prompt(retrieved_chunks: list[dict], job_description: str) -> str:
-    """
-    Builds the prompt for the LLM.
-    Chunks are injected as grounded context — LLM is instructed
-    to only use what's provided, never invent.
-    """
+def build_prompt(retrieved_chunks: list[dict], job_description: str, contact_info: str) -> str:
     context = "\n\n".join(
         [f"- {chunk['text']}" for chunk in retrieved_chunks]
     )
 
     prompt = f"""
-You are a professional resume writer. Your job is to write a tailored resume for the candidate below.
+You are a professional resume writer. Your job is to write a tailored resume.
 
-STRICT RULES:
-- Only use the experience provided in the context below
-- Do not invent, embellish, or add any skills or responsibilities not present in the context
-- Every bullet point must be traceable to a provided chunk
+STRICT RULES — NEVER VIOLATE THESE:
+- NEVER use placeholders like [Your Name] or [Your Email]
+- NEVER change job titles, company names, or dates — use them exactly as provided
+- NEVER invent or embellish anything not in the context
+- If a detail is not provided, leave it out entirely
 
-JOB DESCRIPTION:
+CANDIDATE CONTACT INFORMATION (always include exactly):
+{contact_info}
+
+JOB DESCRIPTION (always include exactly):
 {job_description}
 
 CANDIDATE EXPERIENCE (retrieved from their resume):
 {context}
 
-Write a tailored, professional resume in plain text. Include:
+Write a tailored professional resume. Include:
+- Candidate's real contact info from above
 - A short professional summary (2-3 sentences)
-- A work experience section with bullet points
-- A skills section based only on what appears in the context
+- Work experience using ONLY real titles, companies and dates from the context
+- Bullet points grounded only in the provided context
+- Skills section based only on what appears in the context
 """
     return prompt
 
 
-def generate_resume(retrieved_chunks: list[dict], job_description: str) -> str:
-    """
-    Calls GPT-4o with the grounded prompt and returns the generated resume.
-    """
-    prompt = build_prompt(retrieved_chunks, job_description)
+def generate_resume(retrieved_chunks: list[dict], job_description: str, contact_info: str = "") -> str:
+    prompt = build_prompt(retrieved_chunks, job_description, contact_info)
 
     response = client.chat.completions.create(
         model="gpt-4o",
         messages=[
             {
                 "role": "system",
-                "content": "You are a professional resume writer. You only use provided context. You never hallucinate."
+                "content": "You are a professional resume writer. You only use provided context. You never hallucinate. You never use placeholder text."
             },
             {
                 "role": "user",
                 "content": prompt
             }
         ],
-        temperature=0.3  # low temperature = more consistent, less creative
+        temperature=0.3
     )
 
     return response.choices[0].message.content
