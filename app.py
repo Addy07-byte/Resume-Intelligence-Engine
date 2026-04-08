@@ -12,7 +12,11 @@ from core.jd_processor import process_job_description
 from core.generator import generate_resume
 from core.exporter import export_to_pdf, export_to_docx
 
+import os
 load_dotenv()
+# Streamlit Cloud injects secrets as env vars
+if "OPENAI_API_KEY" in st.secrets:
+    os.environ["OPENAI_API_KEY"] = st.secrets["OPENAI_API_KEY"]
 
 st.set_page_config(
     page_title="Instant Resume Builder",
@@ -301,7 +305,7 @@ with right:
                     Your tailored resume awaits
                 </p>
                 <p style="font-size:0.75rem;color:#E5E7EB;margin:0">
-                    Upload a resume · Paste a JD · Click Generate
+                    Upload a resume · Paste a D · Click Generate
                 </p>
             </div>
             """, unsafe_allow_html=True)
