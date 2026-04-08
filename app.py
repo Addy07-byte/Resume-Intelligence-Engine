@@ -67,6 +67,14 @@ div[data-testid="stFileUploader"] section {
     min-height: unset !important;
     border-radius: 8px !important;
 }
+
+/* Added CSS to fix the file uploader button overlap */
+div[data-testid="stFileUploader"] button {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+    font-family: 'Inter', sans-serif !important;
+}
+
 div[data-testid="stFileUploaderDropzoneInstructions"] span {
     font-size: 0.75rem !important;
 }
@@ -181,8 +189,9 @@ with left:
     with st.container(border=True):
         st.caption("STEP 01")
         st.subheader("Upload Resume")
+        # Updated to provide a valid string label so Streamlit spacing doesn't collapse
         uploaded_files = st.file_uploader(
-            " ",
+            "Upload your resume",
             type=["pdf", "docx"],
             accept_multiple_files=True,
             label_visibility="collapsed"
@@ -198,7 +207,7 @@ with left:
         st.caption("STEP 02")
         st.subheader("Paste Job Description")
         raw_jd = st.text_area(
-            " ",
+            "Paste Job Description",
             height=150,
             placeholder="Paste the full job description here...",
             label_visibility="collapsed"
@@ -250,11 +259,14 @@ if generate_clicked:
                 collection, query_vector, k=5)
 
             st.write("✍️  Drafting your tailored resume...")
-            result = generate_resume(
-                retrieved_chunks,
-                clean_jd,
-                contact_info=st.session_state.get("contact_info", "")
-            )
+            # Wrapped the generation step in a spinner for better UX during API calls
+            with st.spinner("GPT-4o is optimizing your bullets..."):
+                result = generate_resume(
+                    retrieved_chunks,
+                    clean_jd,
+                    contact_info=st.session_state.get("contact_info", "")
+                )
+            
             st.session_state.generated_resume = result
             status.update(
                 label="✅  Resume ready!",
@@ -267,7 +279,7 @@ with right:
         with st.container(border=True):
             st.success("✓  Your tailored resume is ready — review and edit below.")
             edited_resume = st.text_area(
-                " ",
+                "Review Resume",
                 value=st.session_state.generated_resume,
                 height=400,
                 label_visibility="collapsed"
