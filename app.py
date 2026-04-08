@@ -182,7 +182,7 @@ with left:
         st.caption("STEP 01")
         st.subheader("Upload Resume")
         uploaded_files = st.file_uploader(
-            "",
+            " ",
             type=["pdf", "docx"],
             accept_multiple_files=True,
             label_visibility="collapsed"
@@ -198,7 +198,7 @@ with left:
         st.caption("STEP 02")
         st.subheader("Paste Job Description")
         raw_jd = st.text_area(
-            "",
+            " ",
             height=150,
             placeholder="Paste the full job description here...",
             label_visibility="collapsed"
@@ -267,7 +267,7 @@ with right:
         with st.container(border=True):
             st.success("✓  Your tailored resume is ready — review and edit below.")
             edited_resume = st.text_area(
-                "",
+                " ",
                 value=st.session_state.generated_resume,
                 height=400,
                 label_visibility="collapsed"
