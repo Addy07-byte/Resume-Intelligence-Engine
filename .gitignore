@@ -12,3 +12,4 @@ venv/
 test_resume.docx
 test_resume.pdf
 samples/
+.streamlit/secrets.toml
