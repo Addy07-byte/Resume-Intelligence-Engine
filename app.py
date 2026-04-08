@@ -12,15 +12,15 @@ from core.jd_processor import process_job_description
 from core.generator import generate_resume
 from core.exporter import export_to_pdf, export_to_docx
 
-import os
 load_dotenv()
-# Streamlit Cloud injects secrets as env vars
+
+# Streamlit Cloud secrets
 if "OPENAI_API_KEY" in st.secrets:
     os.environ["OPENAI_API_KEY"] = st.secrets["OPENAI_API_KEY"]
 
 st.set_page_config(
-    page_title="Instant Resume Builder",
-    page_icon="⚡",
+    page_title="Resume Tailoring — Grounded in Your Experience",
+    page_icon="✍️",
     layout="wide",
     initial_sidebar_state="collapsed"
 )
@@ -165,11 +165,11 @@ if "contact_info" not in st.session_state:
     st.session_state.contact_info = ""
 
 # ── Header ────────────────────────────────────────────────────
-st.markdown("# ⚡ Instant Resume Builder <span class='badge'>RAG · GPT-4o</span>",
+st.markdown("# ✍️ Resume Tailoring <span class='badge'>RAG · GPT-4o</span>",
             unsafe_allow_html=True)
 st.markdown(
     "<p style='font-size:0.8rem;color:#6B7280;margin:0.1rem 0 0.5rem 0'>"
-    "Tailored to the job. Grounded in your experience.</p>",
+    "Grounded in your real experience. Tailored to the job.</p>",
     unsafe_allow_html=True
 )
 st.divider()
@@ -182,7 +182,7 @@ with left:
         st.caption("STEP 01")
         st.subheader("Upload Resume")
         uploaded_files = st.file_uploader(
-            "upload",
+            "",
             type=["pdf", "docx"],
             accept_multiple_files=True,
             label_visibility="collapsed"
@@ -198,23 +198,21 @@ with left:
         st.caption("STEP 02")
         st.subheader("Paste Job Description")
         raw_jd = st.text_area(
-            "jd",
+            "",
             height=150,
             placeholder="Paste the full job description here...",
             label_visibility="collapsed"
         )
 
-    # Step 03 — button only inside container
     with st.container(border=True):
         st.caption("STEP 03")
         generate_clicked = st.button(
-            "⚡  Generate Tailored Resume",
+            "✍️  Tailor My Resume",
             use_container_width=True,
             type="primary"
         )
 
-# Status and pipeline run OUTSIDE the container and column
-# This prevents the overlap glitch
+# ── Pipeline — outside columns to avoid overlap glitch ────────
 if generate_clicked:
     if not uploaded_files:
         st.error("Upload at least one resume.")
@@ -251,7 +249,7 @@ if generate_clicked:
             retrieved_chunks = retrieve_relevant_chunks(
                 collection, query_vector, k=5)
 
-            st.write("✍️  Drafting your resume...")
+            st.write("✍️  Drafting your tailored resume...")
             result = generate_resume(
                 retrieved_chunks,
                 clean_jd,
@@ -267,9 +265,9 @@ if generate_clicked:
 with right:
     if st.session_state.generated_resume:
         with st.container(border=True):
-            st.success("✓  Resume ready — review and edit below.")
+            st.success("✓  Your tailored resume is ready — review and edit below.")
             edited_resume = st.text_area(
-                "resume_out",
+                "",
                 value=st.session_state.generated_resume,
                 height=400,
                 label_visibility="collapsed"
@@ -299,13 +297,13 @@ with right:
         with st.container(border=True):
             st.markdown("""
             <div class="empty-panel">
-                <div style="font-size:2.5rem;opacity:0.15">📄</div>
+                <div style="font-size:2.5rem;opacity:0.15">✍️</div>
                 <p style="font-family:'Syne',sans-serif;font-weight:700;
                    font-size:0.95rem;color:#D1D5DB;margin:0">
                     Your tailored resume awaits
                 </p>
                 <p style="font-size:0.75rem;color:#E5E7EB;margin:0">
-                    Upload a resume · Paste a D · Click Generate
+                    Upload a resume · Paste a JD · Click Tailor
                 </p>
             </div>
             """, unsafe_allow_html=True)
