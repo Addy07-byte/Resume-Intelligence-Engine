@@ -10,12 +10,23 @@ A RAG-powered system that ingests a user's resume, retrieves relevant experience
 - fpdf2 + python-docx (export)
 
 ## How It Works
-1. Upload 1-3 resume PDFs
-2. System parses and embeds all content
-3. Paste a job description
-4. System retrieves most relevant experience
-5. LLM generates a tailored resume
-6. Download as PDF or DOCX
+
+### Deployed (v2.0)
+1. User submits a query via Streamlit interface
+2. OpenAI API processes query and returns response
+3. App captures real token usage from API response
+4. Multi-feature linear regression model (built from scratch in NumPy)
+   predicts water consumption based on tokens and model type
+5. Result displayed dynamically per query
+
+### Research Pipeline (v3.0, not yet wired into deployment)
+- Synthetic dataset generation using Li et al. 2023 WUE values per region
+- Three models compared: linear regression (ordinal), linear regression 
+  (one-hot), decision tree
+- Decision tree performs best (MAE 0.000659, 72% improvement over baseline)
+- Feature importance: model type (40%), tokens (38%), region (22%)
+- Next step: wire the decision tree into the deployed app so predictions
+  account for region
 
 ## Setup
 1. Clone the repo
