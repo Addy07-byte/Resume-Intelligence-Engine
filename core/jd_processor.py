@@ -3,7 +3,7 @@ from openai import OpenAI
 
 load_dotenv()
 
-client = OpenAI()
+
 
 
 def process_job_description(raw_jd: str) -> str:
@@ -11,8 +11,9 @@ def process_job_description(raw_jd: str) -> str:
     Takes a raw job description and uses an LLM to strip boilerplate.
     Returns only the skills, responsibilities, and requirements.
     This clean output is used as the query for ChromaDB retrieval.
-    """
 
+    """
+    client = OpenAI()
     response = client.chat.completions.create(
         model="gpt-4o",
         messages=[
