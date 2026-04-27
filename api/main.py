@@ -1,4 +1,5 @@
 from fastapi import FastAPI, UploadFile, File, Form
+from typing import List
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import chromadb
@@ -34,7 +35,7 @@ def health():
 
 @app.post("/analyze", response_model=AnalyzeResponse)
 async def analyze(
-    files: list[UploadFile] = File(...),
+    files: List[UploadFile] = File(...),
     job_description: str = Form(...)
 ):
     try:
