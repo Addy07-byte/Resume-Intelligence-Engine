@@ -50,6 +50,9 @@ async def analyze(
                 tmp_path = tmp.name
 
             text = parse_resume(tmp_path)
+            if text is None or text.strip() == "":
+                raise ValueError(f"Failed to parse resume file: {file.filename}. Ensure it's a valid PDF, DOCX, or TXT file.")
+            
             if i == 0:
                 contact_info = text
 
