@@ -3,9 +3,11 @@ from openai import OpenAI
 
 load_dotenv()
 
-client = OpenAI()
+
 
 def build_prompt(retrieved_chunks: list[dict], job_description: str, contact_info: str) -> str:
+
+    client = OpenAI()
     context = "\n\n".join(
         [f"- {chunk['text']}" for chunk in retrieved_chunks]
     )
