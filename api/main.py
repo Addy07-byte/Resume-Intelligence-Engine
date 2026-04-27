@@ -40,27 +40,32 @@ async def analyze(
     try:
         client = chromadb.Client()
         collection = get_collection(client)
-        # rest of code...
+        model = get_embedding_model()
+        contact_info = ""
+
+        for i, file in enumerate(files):
+            suffix = os.path.splitext(file.filename)[1]
+            with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp:
+                tmp.write(await file.read())
+                tmp_path = tmp.name
+
+            text = parse_resume(tmp_path)
+            if i == 0:
+                contact_info = text
+
+            chunks = chunk_text(text)
+            embeddings, metadatas = embed_chunks(chunks, source_filename=file.filename)
+            store_embeddings(collection, chunks, embeddings, metadatas)
+            os.unlink(tmp_path)
+
+        clean_jd = process_job_description(job_description)
+        query_vector = model.embed_query(clean_jd)
+        retrieved_chunks = retrieve_relevant_chunks(collection, query_vector, k=5)
+        result = generate_resume(retrieved_chunks, clean_jd, contact_info=contact_info)
+
+        return AnalyzeResponse(status="success", tailored_resume=result)
     except Exception as e:
-        return {"status": "error", "message": str(e)}
-    for i, file in enumerate(files):
-        suffix = os.path.splitext(file.filename)[1]
-        with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp:
-            tmp.write(await file.read())
-            tmp_path = tmp.name
-
-        text = parse_resume(tmp_path)
-        if i == 0:
-            contact_info = text
-
-        chunks = chunk_text(text)
-        embeddings, metadatas = embed_chunks(chunks, source_filename=file.filename)
-        store_embeddings(collection, chunks, embeddings, metadatas)
-        os.unlink(tmp_path)
-
-    clean_jd = process_job_description(job_description)
-    query_vector = model.embed_query(clean_jd)
-    retrieved_chunks = retrieve_relevant_chunks(collection, query_vector, k=5)
-    result = generate_resume(retrieved_chunks, clean_jd, contact_info=contact_info)
-
-    return AnalyzeResponse(status="success", tailored_resume=result)
+        import traceback
+        print(f"ERROR in /analyze: {str(e)}")
+        print(traceback.format_exc())
+        raise
