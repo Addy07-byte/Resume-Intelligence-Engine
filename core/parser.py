@@ -15,3 +15,11 @@ def parse_resume(file_path: str) -> str:
         for paragraph in doc.paragraphs:
             text += paragraph.text + "\n"
         return text
+    
+    elif file_path.endswith(".txt"):
+        with open(file_path, "r", encoding="utf-8") as f:
+            return f.read()
+
+    else:
+        raise ValueError(f"Unsupported file format: {file_path}. Supported: .pdf, .docx, .txt")
+
