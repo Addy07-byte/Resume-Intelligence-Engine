@@ -37,11 +37,12 @@ async def analyze(
     files: list[UploadFile] = File(...),
     job_description: str = Form(...)
 ):
-    client = chromadb.Client()
-    collection = get_collection(client)
-    model = get_embedding_model()
-    contact_info = ""
-
+    try:
+        client = chromadb.Client()
+        collection = get_collection(client)
+        # rest of code...
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
     for i, file in enumerate(files):
         suffix = os.path.splitext(file.filename)[1]
         with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp:
